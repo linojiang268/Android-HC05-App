@@ -1,5 +1,6 @@
 package com.menthoven.arduinoandroid;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -7,9 +8,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -119,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
                     }).show();
 
         }
+
+        checkBlePermission();
     }
 
     @Override protected void onStart() {
@@ -211,6 +218,57 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    /**
+     * 检查蓝牙权限
+     */
+    public void checkBlePermission() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    1);
+        } else {
+//            P.log("已申请权限");
+            this.openBluetooth();
+        }
+    }
+
+    private void openBluetooth() {
+//        if (BaseApp.sBluetoothClient.isBluetoothOpened()) {
+//            ToastUtils.showShort("蓝牙已开启");
+//            scan();
+//        } else {
+//            BaseApp.sBluetoothClient.registerBluetoothStateListener(new BluetoothStateListener() {
+//                @Override
+//                public void onBluetoothStateChanged(boolean openOrClosed) {
+//                    if (openOrClosed) {
+//                        ToastUtils.showShort("蓝牙已开启");
+//                        scan();
+//                    }
+//                }
+//            });
+//        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1: {
+                // 如果请求被取消，则结果数组为空。
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    P.log("同意权限申请");
+                    this.openBluetooth();
+                } else {
+//                    P.log("拒绝权限申请");
+                }
+            }
+        }
+    }
 }
 
 

@@ -2,6 +2,7 @@ package com.menthoven.arduinoandroid;
 
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ public class BluetoothDevicesAdapter extends ArrayAdapter<BluetoothDevice> {
         }
 
         // Populate the data into the template view using the data object
-        viewHolder.name.setText(device.getName());
+        viewHolder.name.setText(TextUtils.isEmpty(device.getName()) ? "未知" : device.getName());
         viewHolder.address.setText(device.getAddress());
         // Return the completed to render on screen
         return convertView;
