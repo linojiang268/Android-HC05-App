@@ -63,17 +63,6 @@ public class BluetoothActivity extends AppCompatActivity {
     private boolean autoScrollIsChecked = true;
     public static boolean showTimeIsChecked = true;
 
-    @OnClick(R.id.send_button) void send() {
-        // Send a item_message using content of the edit text widget
-        String message = editText.getText().toString();
-        if (message.trim().length() == 0) {
-            editText.setError("Enter text first");
-        } else {
-            sendMessage(message);
-            editText.setText("");
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +71,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
 
-        editText.setError("Enter text first");
+        editText.setError("请输入内容");
 
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -94,8 +83,8 @@ public class BluetoothActivity extends AppCompatActivity {
             }
         });
 
-        snackTurnOn = Snackbar.make(coordinatorLayout, "Bluetooth turned off", Snackbar.LENGTH_INDEFINITE)
-                .setAction("Turn On", new View.OnClickListener() {
+        snackTurnOn = Snackbar.make(coordinatorLayout, "蓝牙已关闭", Snackbar.LENGTH_INDEFINITE)
+                .setAction("开启蓝牙", new View.OnClickListener() {
                     @Override public void onClick(View v) {
                         enableBluetooth();
                     }
@@ -147,26 +136,35 @@ public class BluetoothActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.REQUEST_ENABLE_BT) {
             if (resultCode == RESULT_OK) {
-                setStatus("None");
+                setStatus("无");
             } else {
-                setStatus("Error");
-                Snackbar.make(coordinatorLayout, "Failed to enable bluetooth", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Try Again", new View.OnClickListener() {
+                setStatus("错误");
+                Snackbar.make(coordinatorLayout, "开启蓝牙失败", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("再试一次", new View.OnClickListener() {
                             @Override public void onClick(View v) {
                                 enableBluetooth();
                             }
                         }).show();
             }
         }
-
     }
 
+    @OnClick(R.id.send_button) void send() {
+        // Send a item_message using content of the edit text widget
+        String message = editText.getText().toString();
+        if (message.trim().length() == 0) {
+            editText.setError("请输入内容");
+        } else {
+            sendMessage(message);
+            editText.setText("");
+        }
+    }
 
     private void sendMessage(String message) {
         // Check that we're actually connected before trying anything
         if (bluetoothService.getState() != Constants.STATE_CONNECTED) {
-            Snackbar.make(coordinatorLayout, "You are not connected", Snackbar.LENGTH_LONG)
-                    .setAction("Connect", new View.OnClickListener() {
+            Snackbar.make(coordinatorLayout, "未连接设备", Snackbar.LENGTH_LONG)
+                    .setAction("连接", new View.OnClickListener() {
                         @Override public void onClick(View v) {
                             reconnect();
                         }
@@ -195,20 +193,20 @@ public class BluetoothActivity extends AppCompatActivity {
                 case Constants.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case Constants.STATE_CONNECTED:
-                            activity.setStatus("Connected");
+                            activity.setStatus("已连接");
                             activity.reconnectButton.setVisible(false);
                             activity.toolbalProgressBar.setVisibility(View.GONE);
                             break;
                         case Constants.STATE_CONNECTING:
-                            activity.setStatus("Connecting");
+                            activity.setStatus("连接中");
                             activity.toolbalProgressBar.setVisibility(View.VISIBLE);
                             break;
                         case Constants.STATE_NONE:
-                            activity.setStatus("Not Connected");
+                            activity.setStatus("未连接");
                             activity.toolbalProgressBar.setVisibility(View.GONE);
                             break;
                         case Constants.STATE_ERROR:
-                            activity.setStatus("Error");
+                            activity.setStatus("错误");
                             activity.reconnectButton.setVisible(true);
                             activity.toolbalProgressBar.setVisibility(View.GONE);
                             break;
@@ -234,7 +232,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
                 case Constants.MESSAGE_SNACKBAR:
                     Snackbar.make(activity.coordinatorLayout, msg.getData().getString(Constants.SNACKBAR), Snackbar.LENGTH_LONG)
-                            .setAction("Connect", new View.OnClickListener() {
+                            .setAction("连接", new View.OnClickListener() {
                                 @Override public void onClick(View v) {
                                     activity.reconnect();
                                 }

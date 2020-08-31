@@ -77,7 +77,7 @@ public class BluetoothService {
         // Send a failure item_message back to the Activity
         Message msg = myHandler.obtainMessage(Constants.MESSAGE_SNACKBAR);
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.SNACKBAR, "Unable to connect");
+        bundle.putString(Constants.SNACKBAR, "无法连接");
         msg.setData(bundle);
         myHandler.sendMessage(msg);
         setState(Constants.STATE_ERROR);
@@ -92,7 +92,7 @@ public class BluetoothService {
         // Send a failure item_message back to the Activity
         Message msg = myHandler.obtainMessage(Constants.MESSAGE_SNACKBAR);
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.SNACKBAR, "Cconnection was lost");
+        bundle.putString(Constants.SNACKBAR, "连接断开");
         msg.setData(bundle);
         myHandler.sendMessage(msg);
         setState(Constants.STATE_ERROR);
@@ -121,7 +121,7 @@ public class BluetoothService {
         // Synchronize a copy of the ConnectedThread
         synchronized (this) {
             if (state != Constants.STATE_CONNECTED) {
-                Log.e(Constants.TAG, "Trying to send but not connected");
+                Log.e(Constants.TAG, "发送失败：未连接");
                 return;
             }
             r = connectedThread;
@@ -216,7 +216,7 @@ public class BluetoothService {
             byte[] buffer = new byte[1024];  // buffer store for the stream
             int bytes; // bytes returned from read()
 
-            StringBuilder readMessage = new StringBuilder();
+//            StringBuilder readMessage = new StringBuilder();
 
             // Keep listening to the InputStream until an exception occurs
             while (true) {
@@ -224,13 +224,15 @@ public class BluetoothService {
 
                     bytes = mmInStream.read(buffer);
                     String read = new String(buffer, 0, bytes);
-                    readMessage.append(read);
 
-                    if (read.contains("\n")) {
+                    myHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, read).sendToTarget();
 
-                        myHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
-                        readMessage.setLength(0);
-                    }
+//                    readMessage.append(read);
+
+//                    if (read.contains("\n")) {
+//                        myHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, readMessage.toString()).sendToTarget();
+//                        readMessage.setLength(0);
+//                    }
 
                 } catch (IOException e) {
 

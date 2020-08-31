@@ -8,6 +8,8 @@ import java.util.UUID;
 public interface Constants {
 
     String TAG = "Arduino - Android";
+    int REQUEST_PERMISSION = 11;
+
     int REQUEST_ENABLE_BT = 1;
 
     // message types sent from the BluetoothChatService Handler
